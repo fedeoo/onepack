@@ -7,7 +7,9 @@ const presetsMap = {
 };
 const pluginsMap = {
   decorators: require.resolve('babel-plugin-transform-decorators-legacy'),
-}
+  runtime: require.resolve('babel-plugin-transform-runtime'),
+  import: require.resolve('babel-plugin-import'),
+};
 module.exports = function getBabelOptions(options = {}) {
 
   const babelConfig = {
@@ -21,13 +23,17 @@ module.exports = function getBabelOptions(options = {}) {
   }
 
   ['es2015', 'react', 'stage0'].forEach((name) => {
-    if(options[name]) {
+    if(options.presets[name]) {
       babelConfig.presets.push(presetsMap[name]);
     }
   });
-  ['decorators'].forEach((name) => {
-    if(options[name]) {
-      babelConfig.plugins.push(pluginsMap[name]);
+  ['decorators', 'runtime', 'import'].forEach((name) => {
+    if(options.plugins[name]) {
+      if (typeof options.plugins[name] === 'object') {
+        babelConfig.plugins.push([pluginsMap[name], options.plugins[name]])
+      } else {
+        babelConfig.plugins.push(pluginsMap[name]);
+      }
     }
   });
 

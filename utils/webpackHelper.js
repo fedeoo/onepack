@@ -30,8 +30,8 @@ function generateEntries (config, isProd) {
     process.exit(0);
   }
   const entry = {};
-  if (config.common && config.common.length > 0) {
-    entry.common = config.common;
+  if (config.plugins.commonChunks && config.plugins.commonChunks.length > 0) {
+    entry.common = config.plugins.commonChunks;
   }
 
   return _.reduce(entryFiles, function(entryObj, entryFile) {
@@ -41,7 +41,8 @@ function generateEntries (config, isProd) {
       return entryObj;
     }
     entryObj[chunkName] = [
-      require.resolve('./webpackHotDevClient'),
+      require.resolve('./polyfills'),
+      require.resolve('react-dev-utils/webpackHotDevClient'),
     ].concat(entryFile);
     return entryObj;
   }, entry);
@@ -66,14 +67,15 @@ function isSamePath(fileA, fileB) {
  */
 function genarateHtmlPlugins(config) {
   const entryFiles = getEntries(config.entry);
-  const templates = getTemplates(config.template);
+  const htmlConfig = config.plugins.htmlWebpack;
+  const templates = getTemplates(htmlConfig.template);
   if(templates.length === 0) {
-    console.log(`src 目录下 找不到模板文件 ${config.template}`);
+    console.log(`src 目录下 找不到模板文件 ${htmlConfig.template}`);
   }
   return _.map(entryFiles, function (entryFile) {
     const chunkName = getChunName(entryFile);
     const chunks = [chunkName];
-    if (config.common && config.common.length > 0) {
+    if (config.plugins.commonChunks && config.plugins.commonChunks.length > 0) {
       chunks.push('common');
     }
     const template = templates.find(item => isSamePath(entryFile, item)) || templates[0];

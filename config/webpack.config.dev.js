@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const fs = require('fs');
 const path = require('path');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
+const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const helper = require('../utils/webpackHelper');
 const paths = require('./paths');
 const setRulesAndPlugins = require('./setRulesAndPlugins');
@@ -12,7 +13,14 @@ module.exports = function (config) {
 
   const rules = [];
   let plugins = [
+    // Add module names to factory functions so they appear in browser profiler.
+    new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
+    // If you require a missing module and then `npm install` it, you still have
+    // to restart the development server for Webpack to discover it. This plugin
+    // makes the discovery automatic so you don't have to restart.
+    // See https://github.com/facebookincubator/create-react-app/issues/186
+    new WatchMissingNodeModulesPlugin(paths.appNodeModules),
   ];
 
   setRulesAndPlugins(plugins, rules, config);
@@ -31,8 +39,6 @@ module.exports = function (config) {
       includeSourcemap: false,
     }));
   }
-  const htmlPlugins = helper.genarateHtmlPlugins(config, false);
-  plugins = plugins.concat(htmlPlugins);
 
   return {
     context: paths.appSrc,
@@ -42,7 +48,7 @@ module.exports = function (config) {
       path: paths.appBuild,
       filename: '[name].js',
       chunkFilename: '[name].js',
-      publicPath: config.publicPath,
+      publicPath: config.output.publicPath,
       crossOriginLoading: 'anonymous',
     },
     resolve: {

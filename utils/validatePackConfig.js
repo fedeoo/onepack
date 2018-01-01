@@ -18,7 +18,7 @@ module.exports = function validatePackConfig(packConfig) {
     console.error('Lack of entry config or entry file is not exist!');
     return false;
   }
-  if (!isRelativeFileExist(packConfig.template)) {
+  if (!isRelativeFileExist(packConfig.plugins.htmlWebpack.template)) {
     console.error('Lack of template config or template file is not exist!');
     return false;
   }

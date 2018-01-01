@@ -1,92 +1,81 @@
-# onepack
+# o-pack
 
-`onepack` 是针对 onebox 应用的 CLI 工具。onebox 的应用场景决定 onepack 只处理通用的场景，部分特性暂时还是做了保留。
+`o-pack` 只是 webpack 的封装：隐藏构建优化的逻辑，暴露更加语义化的配置。
+
+[PS: 最开始在公司统一做的构建工具就支持这些功能与`roadhog`非常相似，这个项目只是原来项目的重写，主要是改变了对配置的组织以及代码的重写。]
 
 ## Getting Started
 
 ### 安装
 
 ```sh
-tnpm i onepack -g
+npm i o-pack -g
 ```
 
 ### 使用
 
 本地开发
 ```
-onepack start
+o-pack start
 ```
 
 打包
 ```
-onepack build
+o-pack build
 ```
 
 ## 配置
-
-onepack 的配置文件在项目根目录下的 `pack.config.json`，只支持 `JSON` 格式是为了便于约束规范使用方式，也便于统一的升级兼容。
-开发环境下服务启动后会监视 `pack.config.json` 文件变化，当文件发生变更时，重新启动编译。
 
 默认配置：
 
 ```js
 {
-  entry: './main.js',
-  template: './index.html',
-  filename: 'index.html',
-  common: [],
-  publicPath: '/',
+  entry: './main.js', // 路径相对 `src/` 目录，必须指定
+  output: {
+    publicPath: '/',
+  },
   externals: {
   },
+  plugins: {
+    commonChunks: [], // 仅支持数组
+    htmlWebpack: {
+      template: './index.html', // 相对 src
+      filename: 'index.html',
+    },
+  },
   loaders: {
-    babel: { es2015: true, react: true, stage0: true, decorators: true },
-    css: { modules: false, scss: false, less: false, postcss: false },
+    babel: {
+      presets: { es2015: true, react: true, stage0: true },
+      plugins: {
+        decorators: false,
+        import: false, // 可接受配置对象
+        runtime: {
+          helper: false,
+          polyfill: false,
+          regenerator: true,
+        },
+      },
+    },
+    css: {
+      modules: false,
+      postcss: true,
+    },
+    scss: false,
+    less: false
   },
   devServer: {
-    disableHostCheck: true,
-    compress: true,
-    clientLogLevel: 'none',
-    contentBase: paths.appBuild,
-    watchContentBase: true,
-    hot: true,
-    stats: {
-      chunks: false,
-      colors: true
-    },
-    publicPath: '/',
-    watchOptions: {
-      ignored: /node_modules/,
-    },
-    proxy: {},
-    historyApiFallback: true,
-    host: '127.0.0.1',
-    port: 8080,
   }
 }
 ```
 
-### entry
-项目入口文件，路径相对 `src/` 目录，必须指定
-
-### template
-项目模板文件，路径相对 `src/` 目录，必须指定
-
-### filename
-项目构建的 html 文件
-
-### common
-webpack 构建时 commonChunks 指定的公共模块
-
-### publicPath
-开发环境为 `/`，生产环境会替换为项目的 CDN 路径前缀
-
-### externals
-外部模块
+### plugins
+commonChunks 只支持数组
 
 ### loaders
+支持：babel css less scss 配置
 配置依赖的 loaders，目前支持 babel 和 css   
-babel 支持选项：es2015、react、stage0、decorators   
-css 支持选项：scss、less、postcss、modules   
+babel plugins 支持定义配置  
+css、less、scss 支持 modules、postcss 配置项
 
 ### devServer
 

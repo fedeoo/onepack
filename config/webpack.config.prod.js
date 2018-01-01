@@ -12,11 +12,6 @@ module.exports = function (config) {
   const rules = [];
   let plugins = [
     new ExtractTextPlugin('[name].[contenthash:12].css'),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production'),
-      },
-    }),
     new ParallelUglifyPlugin({
       uglifyJS: {
         sourceMap: false,
@@ -28,9 +23,6 @@ module.exports = function (config) {
   ];
   setRulesAndPlugins(plugins, rules, config);
 
-  const htmlPlugins = helper.genarateHtmlPlugins(config, true);
-  plugins = plugins.concat(htmlPlugins);
-
   return {
     bail: true,
     context: paths.appSrc,
@@ -40,7 +32,7 @@ module.exports = function (config) {
       path: paths.appBuild,
       filename: '[name].[chunkhash:12].js',
       chunkFilename: '[name].[chunkhash:12].js',
-      publicPath: config.publicPath,
+      publicPath: config.output.publicPath,
       crossOriginLoading: 'anonymous', // lazy loaded script cross origin
     },
     resolve: {

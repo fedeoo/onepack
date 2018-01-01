@@ -1,6 +1,8 @@
-'use strict';
+/**
+ * The config Demo...
+ */
 
-module.exports = {
+export default {
   entry: './main.js',
   output: {
     publicPath: '/',
@@ -19,19 +21,27 @@ module.exports = {
       presets: { es2015: true, react: true, stage0: true },
       plugins: {
         decorators: false,
+        import: false,
         runtime: {
           helper: false,
           polyfill: false,
           regenerator: true,
         },
-        import: false,
       },
     },
     css: {
       modules: false,
       postcss: true,
     },
-    scss: false,
-    less: false,
+    scss: {
+      modules: true,
+      postcss: true,
+    },
+    less: {
+      modules: true,
+      postcss: true,
+    }
   },
+  devServer: {
+  }
 };
